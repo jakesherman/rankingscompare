@@ -15,7 +15,7 @@ def conjoint(l1, l2):
 
 
 def to_rank(mylist, ties = 'midrank', reverse = True):
-    """Converts a list of integers or floats into a list of integer ranks.
+    """Create a list of ranks corresponding to a list of integers or floats.
 
     Parameters
     ----------
@@ -35,21 +35,21 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
     all([isinstance(item, int) for item in mylist])), \
         'list must be a list of floats or integers!'
     assert ties in ['midrank', 'same', 'notallowed'], 'incorrect ties method'
-    data = sorted([[item, index] for index, item in enumerate(mylist)],
+    data = sorted([[item, i] for i, item in enumerate(mylist)],
         reverse = reverse)
-    current_rank, ranks = 1, []
-    for index, (item, origin_pos) in enumerate(data):
-        consecutive_ties = 0
+    ranks, num_ties = [], 0
+    for pos, (item, i) in enumerate(data):
+        if num_ties > 0:
+            if ties == 'notallowed':
+                raise Exception('Ties not allowed!')
+            ranks.append(pos + 1 - num_ties)
+        else:
+            ranks.append(pos + 1)
         try:
-            if item == data[index + 1][0]:
-                if ties == 'notallowed':
-                    raise Exception('Ties detected!')
-                ranks.append(current_rank)
-                continue
+            if item == data[pos + 1][0]:
+                num_ties += 1
+            else:
+                num_ties = 0
         except:
             pass
-        finally:
-            ranks.append(current_rank)
-            current_rank += 1
-    sorted_ranks = sorted(zip([x[1] for x in data], ranks))
-    return [rank for order, rank in sorted_ranks]
+    return ranks
