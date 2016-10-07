@@ -1,6 +1,8 @@
 """utilities.py
 """
 
+import numpy as np
+
 
 def unique(list):
     """True if every element in a list is unique, False otherwise.
@@ -37,19 +39,26 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
     assert ties in ['midrank', 'same', 'notallowed'], 'incorrect ties method'
     data = sorted([[item, i] for i, item in enumerate(mylist)],
         reverse = reverse)
-    ranks, num_ties = [], 0
+    ranks = []
+    current_ties, ties_end = [], False
     for pos, (item, i) in enumerate(data):
-        if num_ties > 0:
-            if ties == 'notallowed':
-                raise Exception('Ties not allowed!')
-            ranks.append(pos + 1 - num_ties)
-        else:
-            ranks.append(pos + 1)
         try:
             if item == data[pos + 1][0]:
-                num_ties += 1
+                current_ties.append(pos + 1)
             else:
-                num_ties = 0
+                if current_ties:
+                    ties_end = True
         except:
             pass
+        if len(current_ties) > 0 and ties_end:
+            if ties == 'notallowed':
+                raise Exception('No ties allowed!')
+            current_ties.append(pos + 1)
+            if ties == 'midrank':
+                ranks += [np.mean(current_ties)] * len(current_ties)
+            else:
+                ranks += [min(current_ties)] * len(current_ties)
+            current_ties, ties_end = [], False
+        elif not current_ties:
+            ranks.append(pos + 1)
     return ranks
