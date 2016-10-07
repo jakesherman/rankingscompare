@@ -32,8 +32,7 @@ def kendall_tau(l1, l2):
         num_pairs += 1
         higher_ranked_l1 = l1.index(combo[0]) < l1.index(combo[1])
         higher_ranked_l2 = l2.index(combo[0]) < l2.index(combo[1])
-        if higher_ranked_l1 == higher_ranked_l2:
-            num_concordant_pairs += 1
+        num_concordant_pairs += higher_ranked_l1 == higher_ranked_l2
     prob_concordant = num_concordant_pairs / num_pairs
     return 2 * prob_concordant - 1
 
@@ -78,4 +77,5 @@ def ap_correlation(l1, l2, symmetric = False):
                 break
             concordant_pairs += l2.index(higher_ranked_item) < l2.index(item)
         sum_percent_concordant += concordant_pairs / (i - 1)  # % concordant
-    return sum_percent_concordant / (len(l1) - 1)
+    prob_concordant = sum_percent_concordant / (len(l1) - 1)
+    return 2 * prob_concordant - 1
