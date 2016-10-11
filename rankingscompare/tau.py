@@ -41,6 +41,40 @@ def tau_a(l1, l2):
     return 2 * (concordant / pairs) - 1
 
 
+def tau_statistics(l1, l2, combinations):
+    """Calculates the statistics used to compute the various correlation
+    statistics based on Kendall's Tau.
+    """
+    assert len(l1) == len(l2), 'l1 and l2 must be paired data w/ equal length'
+    n, concordant, discordant, l1_ties, l2_ties = len(l1), 0, 0, 0, 0
+    pairs = len(combinations)
+    for combo in combinations:
+        xi, yi, xj, yj = l1[combo[0]], l2[combo[0]], l1[combo[1]], l2[combo[1]]
+        l1_sign, l2_sign = sign(xi - xj), sign(yi - yj)
+        if not ties:
+            concordant += l1_sign == l2_sign
+            discordant += not concordant
+        else:
+            l1_ties += l1_sign == 0
+            l2_ties += l2_sign == 0
+    return pairs, concordant, discordant, l1_ties, l2_ties
+
+
+def ap_correlation_combinations(l1, greater_is_better = True):
+    """Creates a list of combination tuples that are valid in AP correlation.
+    If i = 1, 2, ... n and j = 1, 2, ..., n then only consider combinations
+    starting at i = 2 only where j > i (higher rank).
+    """
+    pairs = []
+    for i in enumerate(l1):
+        if i == 1:
+            continue
+        for j in enumerate(l1):
+            if (greater_is_better and j>i) or (not greater_is_better and j<i):
+                pairs.append((i, j))
+    return pairs
+
+
 def ap_correlation(l1, l2, symmetric = False, reverse = True):
     """Compute the AP correlation coefficient, proposed by Yilmaz et al. [2008]
     as an alternative version of Kendall's Tau that is top-weighted.
