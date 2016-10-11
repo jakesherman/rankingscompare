@@ -9,41 +9,11 @@ import numpy as np
 from utilities import *
 
 
-def tau_a(l1, l2):
-    """Kendall's Tau between two lists of numbers. Kendall's Tau, a rank
-    correlation statisic for conjoint ranked lists that is not top-weighted, and
-    not appropriate for indefinite lists. Assumes no ties.
-
-    Estimates a population parameter, the proability of concordance minus the
-    probability of discordance. Complexity is O(n^2).
-
-    Parameters
-    ----------
-    l1 : list
-        List of numbers.
-    l2 : list
-        List of numbers.
-
-    Returns
-    -------
-    Rank correlation in the set [-1, 1]
-    """
-    assert len(l1) == len(l2), 'l1 and l2 must be paired data w/ equal length'
-    n, concordant = len(l1), 0
-    pairs = choose(n, 2)
-    for combo in itertools.combinations(range(0, n), 2):
-        xi, yi, xj, yj = l1[combo[0]], l2[combo[0]], l1[combo[1]], l2[combo[1]]
-        l1_sign, l2_sign = sign(xi - xj), sign(yi - yj)
-        ties = l1_sign == 0 or l2_sign == 0
-        if ties:
-            raise Exception('No ties allowed in tau_a!')
-        concordant += l1_sign == l2_sign
-    return 2 * (concordant / pairs) - 1
-
-
 def tau_statistics(l1, l2, combinations):
     """Calculates the statistics used to compute the various correlation
-    statistics based on Kendall's Tau.
+    statistics based on Kendall's Tau given two lists of numbers, and a list of
+    tuples, which each tuple consisting of a pair of indexes that can be used to
+    index either l1 or l2.
     """
     assert len(l1) == len(l2), 'l1 and l2 must be paired data w/ equal length'
     n, concordant, discordant, l1_ties, l2_ties = len(l1), 0, 0, 0, 0
@@ -51,13 +21,33 @@ def tau_statistics(l1, l2, combinations):
     for combo in combinations:
         xi, yi, xj, yj = l1[combo[0]], l2[combo[0]], l1[combo[1]], l2[combo[1]]
         l1_sign, l2_sign = sign(xi - xj), sign(yi - yj)
+        ties = l1_sign == 0 or l2_sign == 0
         if not ties:
             concordant += l1_sign == l2_sign
-            discordant += not concordant
+            discordant += l1_sign != l2_sign
         else:
             l1_ties += l1_sign == 0
             l2_ties += l2_sign == 0
     return pairs, concordant, discordant, l1_ties, l2_ties
+
+
+def tau_a(l1, l2):
+    """Compute tau-a, which does not account for ties.
+    """
+    pairs, concordant, discordant, l1_ties, l2_ties = tau_statistics(l1, l2,
+        list(itertools.combinations(range(len(l1)), 2)))
+    if l1_ties + l2_ties > 0:
+        raise Exception('No ties are allowed in tau_a!')
+    return (concordant - discordant) / pairs
+
+
+def tau_b(l1, l2):
+    """Compute tau-b, which accounts for ties.
+    """
+    pairs, concordant, discordant, l1_ties, l2_ties = tau_statistics(l1, l2,
+        list(itertools.combinations(range(len(l1)), 2)))
+    denominator = np.sqrt((pairs - l1_ties) * (pairs - l2_ties))
+    return (concordant - discordant) / denominator
 
 
 def ap_correlation_combinations(l1, greater_is_better = True):

@@ -63,6 +63,8 @@ class TauTestCases(unittest.TestCase):
     a, b, c = [1, 2, 3, 4, 5], [2, 1, 3, 4, 5], [1, 2, 3, 5, 4]
     d, e = [5, 4, 3, 2, 1], [2, 3, 4, 5, 6]
 
+    # tau-a --------------------------------------------------------------------
+
     # Test for non-negativity, should be 1
     def test_tau_a_1(self):
         self.assertTrue(rc.tau_a(self.a, self.a) == 1.0)
@@ -80,6 +82,30 @@ class TauTestCases(unittest.TestCase):
     def test_same_tau_a_values(self):
         self.assertTrue(test_rank_func(rc.tau_a, scipy_kendalltau,
             generate_test_case))
+
+    # Don't allow ties
+    def test_tau_a_no_ties(self):
+        self.assertRaises(Exception, rc.tau_a, [3, 2, 2], [4, 3, 2])
+
+    # tau-b --------------------------------------------------------------------
+
+    # Test for non-negativity, should be 1
+    def test_tau_b_1(self):
+        self.assertTrue(rc.tau_b(self.a, self.a) == 1.0)
+
+    # Complete opposite, should be -1
+    def test_tau_b_2(self):
+        self.assertTrue(rc.tau_b(self.a, self.d) == -1.0)
+
+    # Random example, should both be 0.8
+    def test_tau_b_3(self):
+        self.assertTrue((rc.tau_b(self.a, self.b) == 0.8 and
+        rc.tau_b(self.a, self.c) == 0.8))
+
+    # Agreement w/ scipy's kendalltau function and tau_a, so NO TIES
+    def test_same_tau_b_values(self):
+        self.assertTrue(test_rank_func(rc.tau_b, scipy_kendalltau,
+            generate_test_case_ties))
 
 
 if __name__ == '__main__':
