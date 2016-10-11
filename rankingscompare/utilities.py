@@ -61,4 +61,5 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
             current_ties, ties_end = [], False
         elif not current_ties:
             ranks.append(pos + 1)
-    return ranks
+    return [rank for i, rank in sorted(
+        zip([item_i[1] for item_i in data], ranks))]
