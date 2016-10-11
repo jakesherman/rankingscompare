@@ -6,38 +6,42 @@ version of Kendalls' Tau.
 
 import itertools
 import numpy as np
-from utilities import conjoint, unique
+from utilities import *
 
 
-def kendall_tau(l1, l2):
-    """Computes Kendall's Tau between two ranked lists. Kendall's Tau, a rank
-    correlation metric for conjoint ranked lists that is not top-weighted, and
+def tau_a(l1, l2):
+    """Kendall's Tau between two lists of numbers. Kendall's Tau, a rank
+    correlation statisic for conjoint ranked lists that is not top-weighted, and
     not appropriate for indefinite lists. Assumes no ties.
+
+    Estimates a population parameter, the proability of concordance minus the
+    probability of discordance. Complexity is O(n^2).
 
     Parameters
     ----------
     l1 : list
-        List of items in rank order (position 0 corresponds to rank 1, etc.)
+        List of numbers.
     l2 : list
-        List of items in rank order (position 0 corresponds to rank 1, etc.)
+        List of numbers.
 
     Returns
     -------
     Rank correlation in the set [-1, 1]
     """
-    assert unique(l1) and unique(l2), 'items in lists are not unique!'
-    assert conjoint(l1, l2), 'l1 and l2 are not conjoint ranked lists!'
-    num_pairs, num_concordant_pairs = 0, 0
-    for combo in itertools.combinations(l1, 2):
-        num_pairs += 1
-        higher_ranked_l1 = l1.index(combo[0]) < l1.index(combo[1])
-        higher_ranked_l2 = l2.index(combo[0]) < l2.index(combo[1])
-        num_concordant_pairs += higher_ranked_l1 == higher_ranked_l2
-    prob_concordant = num_concordant_pairs / num_pairs
-    return 2 * prob_concordant - 1
+    assert len(l1) == len(l2), 'l1 and l2 must be paired data w/ equal length'
+    n, concordant = len(l1), 0
+    pairs = choose(n, 2)
+    for combo in itertools.combinations(range(0, n), 2):
+        xi, yi, xj, yj = l1[combo[0]], l2[combo[0]], l1[combo[1]], l2[combo[1]]
+        l1_sign, l2_sign = sign(xi - xj), sign(yi - yj)
+        ties = l1_sign == 0 or l2_sign == 0
+        if ties:
+            raise Exception('No ties allowed in tau_a!')
+        concordant += l1_sign == l2_sign
+    return 2 * (concordant / pairs) - 1
 
 
-def ap_correlation(l1, l2, symmetric = False):
+def ap_correlation(l1, l2, symmetric = False, reverse = True):
     """Compute the AP correlation coefficient, proposed by Yilmaz et al. [2008]
     as an alternative version of Kendall's Tau that is top-weighted.
 
@@ -64,9 +68,14 @@ def ap_correlation(l1, l2, symmetric = False):
     """
     assert unique(l1) and unique(l2), 'items in lists are not unique!'
     assert conjoint(l1, l2), 'l1 and l2 are not conjoint ranked lists!'
+    if symmetric:
+        a_b = ap_correlation(l1, l2, False, reverse)
+        b_a = ap_correlation(l2, l1, False, reverse)
+        return (a_b + b_a) / 2
 
     # Loop through every item ranked below 1 in l1, check to see if all pairs
     # with items of 'higher' (rank 1 > rank 2) in l1 are concordant with l2.
+    l1, l2 = to_rank(l1, reverse = reverse), to_rank(l2, reverse = reverse)
     sum_percent_concordant = 0
     for i, item in enumerate(l1, start = 1):
         if i == 1:

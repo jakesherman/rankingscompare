@@ -1,6 +1,7 @@
 """utilities.py
 """
 
+import math
 import numpy as np
 
 
@@ -63,3 +64,15 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
             ranks.append(pos + 1)
     return [rank for i, rank in sorted(
         zip([item_i[1] for item_i in data], ranks))]
+
+
+def sign(num):
+    """Sign function - is a number positive, negative, or 0?
+    """
+    return num and (1, -1)[num < 0]
+
+
+def choose(n, k):
+    """n choose k
+    """
+    return math.factorial(n) / (math.factorial(k) * math.factorial(n - k))
