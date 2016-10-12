@@ -10,7 +10,7 @@ from utilities import *
 
 
 def average_overlap(items1, items2, k = None):
-    """Compute the average overlap (AO )between two ranked lists of items. Items
+    """Compute the average overlap (AO) between two ranked lists of items. Items
     must be in rank order, starting at 1. [k] is the depth to go down to when
     computing the AO - the maximum is the max of the lengths of the two lists,
     the min is 1.
@@ -19,8 +19,10 @@ def average_overlap(items1, items2, k = None):
     it is called the 'intersection metric' and 'average accuracy' by those
     authors, respectively. This is a similarity score between two sets of ranked
     items, not a correlation coeffcient like Kendall's tau or Spearman's rho.
-    It works with non-conjoint data, on indefinite lists, and is top-weighted.
-    The AO score is contained in the interval [0, 1].
+    It works with non-conjoint data and is top-weighted. It is not a measure
+    however on indefinite lists, it is a measure on their prefixes. The AO score
+    is contained in the interval [0, 1], with higher numbers indicating more
+    similar lists of ranked items.
     """
     if k is None:
         k = max([len(items1), len(items2)])

@@ -45,3 +45,11 @@ def spearman_rho(l1, l2, reverse = True):
     """
     l1, l2 = to_rank(l1, reverse = reverse), to_rank(l2, reverse = reverse)
     return pearson_r(l1, l2)
+
+
+def spearman_footrule(l1, l2, reverse = True):
+    """Compute Spearman's Footrule, the Manhatten distance between the ranks
+    themselves.
+    """
+    l1, l2 = to_rank(l1, reverse = reverse), to_rank(l2, reverse = reverse)
+    return np.sum([np.absolute(xi - yi) for xi, yi in zip(l1, l2)])

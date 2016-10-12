@@ -29,6 +29,10 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
         midrank -> mean of the positions that ties are occupying
         same -> repeat the highest (rank 1 > rank 2) position of the ties
         notallowed -> ties aren't allowed, raise an exception if there are ties
+    reverse : bool
+        If True, higher numbers correspond to higher ranks (aka 1, 2, ...) and
+        lower numbers correspond to lower ranks (ex. 15, 14, ...). If False,
+        the opposite happens.
 
     Returns
     -------
