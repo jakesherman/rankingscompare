@@ -38,9 +38,8 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
     -------
     a list of floats corresponding to the ranks of the items in [list]
     """
-    assert (all([isinstance(item, float) for item in mylist]) or
-    all([isinstance(item, int) for item in mylist])), \
-        'list must be a list of floats or integers!'
+    assert all([isinstance(item, float) or isinstance(item, int)
+                for item in mylist]), 'list must be a list of floats or ints!'
     assert ties in ['midrank', 'same', 'notallowed'], 'incorrect ties method'
     data = sorted([[item, i] for i, item in enumerate(mylist)],
         reverse = reverse)
@@ -54,7 +53,8 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
                 if current_ties:
                     ties_end = True
         except:
-            pass
+            if current_ties:
+                ties_end = True
         if len(current_ties) > 0 and ties_end:
             if ties == 'notallowed':
                 raise Exception('No ties allowed!')
