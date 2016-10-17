@@ -13,7 +13,7 @@ def tau_statistics(l1, l2, combinations):
     """Calculates the statistics used to compute the various correlation
     statistics based on Kendall's tau given two lists of numbers, and a list of
     tuples, which each tuple consisting of a pair of indexes that can be used to
-    index either l1 or l2.
+    index either l1 or l2. Computing these is O(n^2).
     """
     assert len(l1) == len(l2), 'l1 and l2 must be paired data w/ equal length'
     n, concordant, discordant, l1_ties, l2_ties = len(l1), 0, 0, 0, 0
@@ -65,7 +65,7 @@ def tau_b(l1, l2):
 def ap_correlation(l1, l2, symmetric = False, reverse = True):
     """Compute the AP correlation coefficient, proposed by Yilmaz et al. [2008]
     as an alternative version of Kendall's Tau that is top-weighted. Does not
-    account for ties!
+    account for ties! Implementation is O(n^2).
 
     AP correlation is not symmetric by default - l2 is the 'definitive'
     ranked list, and l1 is being compared to l1. In other words, f(a, b) is not

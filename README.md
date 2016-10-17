@@ -10,8 +10,11 @@ Rank correlation and similarity measures. The following are implemented:
 
 To be implemented:
 
-* AP correlation variant that handles ties
+* Smucker's variant of AP correlation that accounts for ties
+* Vigna [2014]'s tau-h, a modified tau-b/AP correlation statistic that 
+accounts for ties
 * Rank-biased overlap (RBO), proposed by Webber et al. [2010]
+* Better handling of data structures containing ordinal data
 
 ## Install
 

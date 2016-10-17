@@ -11,6 +11,13 @@ def unique(list):
     return len(list) == len(set(list))
 
 
+def ties(list):
+    """True if there are going to be ties in a list of values to be converted to
+    ranks, or ranks.
+    """
+    return not unique(list)
+
+
 def conjoint(l1, l2):
     """True if l1 and l2 are conjoint, False otherwise.
     """
