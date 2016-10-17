@@ -1,12 +1,24 @@
 from __future__ import division, print_function
 
 """rbo.py - implementing Rank-Biased Overlap, proposed by Webber et al. [2010],
-and related functions.
+and other set-based functions.
 """
 
 import itertools
 import numpy as np
 from utilities import *
+
+
+def percent_overlap(items1, items2, k = None):
+    """Simply the length of the intersection divided by the length of the union
+    of two sets of items for the first k items in the lists of items. By default
+    k is set to the maximum of the longer list of items.
+    """
+    if k is None:
+        k = max([len(items1), len(items2)])
+    assert k > 0 and k <= max([len(items1), len(items2)]), 'k is out of bounds!'
+    items1_set, items2_set = set(items1[:k]), set(items2[:k])
+    return len(items1_set & items2_set) / len(items1_set | items2_set)
 
 
 def average_overlap(items1, items2, k = None):
@@ -30,6 +42,6 @@ def average_overlap(items1, items2, k = None):
     agreements = []
     for i in range(1, k + 1):
         items1_set, items2_set = set(items1[:i]), set(items2[:i])
-        agreement = len(items1_set.intersection(items2_set)) / i
+        agreement = len(items1_set & items2_set) / i
         agreements.append(agreement)
     return np.mean(agreements)

@@ -80,3 +80,9 @@ def choose(n, k):
     """n choose k
     """
     return math.factorial(n) / (math.factorial(k) * math.factorial(n - k))
+
+
+def even(num):
+    """True if a number if even, False if odd.
+    """
+    return not num % 2

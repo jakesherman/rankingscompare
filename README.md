@@ -3,7 +3,7 @@
 Rank correlation and similarity measures. The following are implemented:
 
 * Spearman's rho (ρ)
-* Spearman's Footrule (Manhattan distance of the ranks themselves)
+* Spearman's Footrule (regular and normalized)
 * Kendalls' tau (τ), including tau-a and tau-b
 * AP correlation (top-weighted alteration of τ)
 * Average overlap
