@@ -1,21 +1,14 @@
-# rankingscompare
+# ordinary
 
-Rank correlation and similarity measures. The following are implemented:
+Measures of association/correlation/similarity for ordinal/rank variables.
 
 * Spearman's rho (ρ)
-* Spearman's Footrule (regular and normalized)
-* Kendalls' tau (τ), including tau-a and tau-b
+* Spearman's footrule (regular and normalized)
+* Kendalls' tau (τ), the tau-b and tau-c variants
 * AP correlation (top-weighted alteration of τ)
-* Average overlap
-
-To be implemented:
-
-* tau-c
-* Smucker's variant of AP correlation that accounts for ties
-* Vigna [2014]'s tau-h, a modified tau-b/AP correlation statistic that 
-accounts for ties
-* Rank-biased overlap (RBO), proposed by Webber et al. [2010]
-* Better handling of data structures containing ordinal data
+* Goodman - Kruskal Gamma
+* Somers' D
+* Percent overlap, average overlap
 
 ## Install
 

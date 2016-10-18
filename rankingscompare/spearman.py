@@ -110,8 +110,8 @@ def spearman_footrule(l1, l2, reverse = True, ranks = False):
 def normalized_spearman_footrule(l1, l2, reverse = True, ranks = False,
     sim = False):
     """Normalized version of Spearman's Footrule (NFr) that divides the value of
-    Spearman's Footrul by the maximum possible value, resulting in a value in
-    the domain of [0, 1]. Described in Aguillo et al. [2010].
+    Spearman's Footrule by the maximum possible value. Described in Aguillo et
+    al. [2010].
 
     Parameters
     ----------
