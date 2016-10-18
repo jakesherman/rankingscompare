@@ -7,6 +7,7 @@ concordance minus the probability of discordance.
 import itertools
 import numpy as np
 from utilities import *
+from warnings import warn
 
 
 def tau_stats(l1, l2, combinations):
@@ -54,12 +55,12 @@ def tau_a(l1, l2):
     """
     pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
     if l1_ties + l2_ties > 0:
-        raise Exception('No ties are allowed in tau_a!')
+        warn('tau-a does not adjust for ties')
     return (concordant - discordant) / pairs
 
 
 def tau_b(l1, l2):
-    """tau-b, which accounts for ties.
+    """tau-b, which accounts for ties. Most suitable for square tables.
 
     Kendall's tau is a rank correlation statisic for conjoint ranked lists that
     is not top-weighted, and not appropriate for indefinite lists. It estimates
@@ -83,14 +84,16 @@ def tau_b(l1, l2):
 
 
 def tau_c(l1, l2):
-    """tau-c, optimized for larger, rectangular tables.
+    """tau-c, optimized for larger, rectangular tables. No adjustment for ties.
     """
     pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
+    if l1_ties + l2_ties > 0:
+        warn('tau-c does not adjust for ties')
     denominator = (2 * m) / (np.power(len(l1), 2) * (m - 1))
     return (concordant - discordant) / denominator
 
 
-def goodman_kruskal_gamma(l1, l2):
+def gamma(l1, l2):
     """Goodman - Kruskal Gamma (G), very similar to Kendall's tau. Gamma is the
     difference in concordant pairs and discordant pairs as a percentage of all
     possible pairs, ignoring ties.
@@ -110,6 +113,38 @@ def goodman_kruskal_gamma(l1, l2):
     """
     pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
     return (concordant - discordant) / (concordant + discordant)
+
+
+def sommers_d(l1, l2, dependent = 'symmetric'):
+    """Somers' D, a measure of ordinal association between l1 and l2. Similar to
+    Kendall's tau and the Gamma statistic.
+
+    Ref: https://stats.stackexchange.com/questions/18112
+
+    Parameters
+    ----------
+    l1: list
+        a list of values
+    l2: list
+        a list of values
+    dependent: str (default is symmetric)
+        Decides whether to make the l1 variable dependent, the l2 variable
+        dependent, or being symmetric and taking the arithmetic mean of having
+        each variable be dependent.
+    Returns
+    -------
+    Sommers' D: float in [-1, 1]
+    """
+    pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
+    if dependent == 'symmetric':
+        return (sommers_d(l1, l2, 'l1') + sommers_d(l1, l2, 'l2')) / 2
+    elif dependent == 'l1':
+        denominator = concordant + discordant + l1_ties
+    elif dependent == 'l2':
+        denominator = concordant + discordant + l2_ties
+    else:
+        raise Exception('Invalid [dependent] argument!')
+    return (concordant - discordant) / denominator
 
 
 def ap_correlation(l1, l2, symmetric = False, reverse = True):
