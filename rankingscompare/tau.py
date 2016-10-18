@@ -32,13 +32,24 @@ def tau_statistics(l1, l2, combinations):
 
 
 def tau_a(l1, l2):
-    """Compute tau-a, which does not account for ties. Inputs are two equal
+    """tau-a, which does not account for ties. Inputs are two equal
     length lists with matching pairs at each index.
 
     Kendall's tau is a rank correlation statisic for conjoint ranked lists that
     is not top-weighted, and not appropriate for indefinite lists. It estimates
     a population parameter, the proability of concordance minus the probability
-    of discordance. Computation time is O(n^2).
+    of discordance.
+
+    Parameters
+    ----------
+    l1: list
+        a list of values
+    l2: list
+        a list of values
+
+    Returns
+    -------
+    Kendall's tau-a: float in [-1, 1]
     """
     pairs, concordant, discordant, l1_ties, l2_ties = tau_statistics(l1, l2,
         list(itertools.combinations(range(len(l1)), 2)))
@@ -48,13 +59,23 @@ def tau_a(l1, l2):
 
 
 def tau_b(l1, l2):
-    """Compute tau-b, which accounts for ties. Inputs are two equal
-    length lists with matching pairs at each index.
+    """tau-b, which accounts for ties.
 
     Kendall's tau is a rank correlation statisic for conjoint ranked lists that
     is not top-weighted, and not appropriate for indefinite lists. It estimates
     a population parameter, the probability of concordance minus the probability
-    of discordance. Computation time is O(n^2).
+    of discordance.
+
+    Parameters
+    ----------
+    l1: list
+        a list of values
+    l2: list
+        a list of values
+
+    Returns
+    -------
+    Kendall's tau-b: float in [-1, 1]
     """
     pairs, concordant, discordant, l1_ties, l2_ties = tau_statistics(l1, l2,
         list(itertools.combinations(range(len(l1)), 2)))
@@ -62,16 +83,53 @@ def tau_b(l1, l2):
     return (concordant - discordant) / denominator
 
 
-def ap_correlation(l1, l2, symmetric = False, reverse = True):
-    """Compute the AP correlation coefficient, proposed by Yilmaz et al. [2008]
-    as an alternative version of Kendall's Tau that is top-weighted. Does not
-    account for ties! Implementation is O(n^2).
+def goodman_kruskal_gamma(l1, l2):
+    """Goodman – Kruskal Gamma (G), very similar to Kendall's tau. Gamma is the
+    difference in concordant pairs and discordant pairs as a percentage of all
+    possible pairs, ignoring ties.
 
-    AP correlation is not symmetric by default - l2 is the 'definitive'
-    ranked list, and l1 is being compared to l1. In other words, f(a, b) is not
-    necessarily f(b, a). Setting symmetric to True takes the mean of f(a, b) and
-    f(b, a). If symmetric is set to True, it doesn't matter which ranked list is
-    l1 and which is l2.
+    Reference: http://www.unesco.org/webworld/idams/advguide/Chapt4_2.htm
+
+    Parameters
+    ----------
+    l1: list
+        a list of values
+    l2: list
+        a list of values
+
+    Returns
+    -------
+    Goodman – Kruskal Gamma: float in [-1, 1]
+    """
+    pairs, concordant, discordant, l1_ties, l2_ties = tau_statistics(l1, l2,
+        list(itertools.combinations(range(len(l1)), 2)))
+    return (concordant - discordant) / (concordant + discordant)
+
+
+def ap_correlation(l1, l2, symmetric = False, reverse = True):
+    """The AP correlation coefficient, proposed by Yilmaz et al. [2008] as an
+    alternative version of Kendall's Tau that is top-weighted. Does not account
+    for ties! Implementation is O(n^2).
+
+    Parameters
+    ----------
+    l1: list
+        a list of values
+    l2: list
+        a list of values
+    symmetric: bool (default is False)
+        AP correlation is not symmetric by default - l2 is the 'definitive'
+        ranked list, and l1 is being compared to l1. In other words, f(a, b) is
+        not necessarily f(b, a). Setting symmetric to True takes the mean of
+        f(a, b) and f(b, a). If symmetric is set to True, it doesn't matter
+        which ranked list is l1 and which is l2.
+    reverse: bool (default is True)
+        whether to rank values in descending order (True) or ascending order
+        (False)
+
+    Returns
+    -------
+    AP correlation: float in [-1, 1]
     """
     if symmetric:
         l1_l2 = ap_correlation(l1, l2, False, reverse)

@@ -10,6 +10,7 @@ Rank correlation and similarity measures. The following are implemented:
 
 To be implemented:
 
+* tau-c
 * Smucker's variant of AP correlation that accounts for ties
 * Vigna [2014]'s tau-h, a modified tau-b/AP correlation statistic that 
 accounts for ties

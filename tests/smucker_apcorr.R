@@ -11,6 +11,16 @@
 
 source("http://www.mansci.uwaterloo.ca/~msmucker/software/apcorr.r")
 
+## Manual checks ---------------------------------------------------------------
+
+# The swap near the top results in a lower AP correlation than Kendall tau-a
+a <- c(100, 70, 50, 40, 35, 30)
+b <- c(45, 55, 40, 10, 20, 3)
+cor(a, b, method = 'kendall')  # 0.733
+apcorr(a, b)   
+
+## Documentation ---------------------------------------------------------------
+
 # Two sample vectors to be compared, one consists of only ties
 apcorr.nosampling(c(1, 2, 3, 4), c(1, 1, 1, 1))  # -1
 apcorr.nosampling(c(4, 3, 2, 1), c(1, 1, 1, 1))  #  1
@@ -24,3 +34,28 @@ apcorr(c(4, 3, 2, 1), c(1, 1, 1, 1))  # -0.0052222
 # higher number of samples.
 apcorr(c(1, 2, 3, 4), c(1, 1, 1, 1), 10000)  # -0.0013
 apcorr(c(4, 3, 2, 1), c(1, 1, 1, 1), 10000)  # -0.0053
+
+## Tie-handling ----------------------------------------------------------------
+
+# Carry over the top ranking of a tie
+truth <- c(1, 2, 3, 4)
+estimate <- c(1, 1, 1, 1)
+results <- c()
+means <- c()
+
+for (i in 1:1000) {
+    permutation <- sample(n)
+    truth <- truth[permutation]
+    estimate <- estimate[permutation]	 
+    result <- apcorr.nosampling(truth, estimate)
+    results <- c(results, result)
+    means <- c(means, result / i)
+}
+
+plot(results)
+plot(means)
+
+# Midrank method - average of the ranks
+truth <- c(1, 2, 3, 4)
+estimate <- c(2.5, 2.5, 2.5, 2.5)
+apcorr.nosampling(truth, estimate)
