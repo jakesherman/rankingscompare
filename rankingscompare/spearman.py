@@ -32,7 +32,9 @@ def covariance(l1, l2, bessel_correction = True):
 
 def pearson_r(l1, l2):
     """Compute Pearson's product-moment correlation coefficient on two lists or
-    arrays of numbers.
+    arrays of numbers. Measures the linear association between two continuous
+    random variables. If the two variables are bivariate normal, this measure
+    provides an exhaustive description of the association.
     """
     assert len(l1) == len(l2), 'list inputs must be paired aka of = length!'
     return covariance(l1, l2) / (std_dev(l1) * std_dev(l2))
@@ -41,7 +43,9 @@ def pearson_r(l1, l2):
 def spearman_rho(l1, l2, reverse = True, ranks = False):
     """Compute Spearman's rho, effectively Pearson's correlation on the ranks
     themselves. It is a non-parametric measure of rank correlation that assesses
-    the monotonic relationship between two variables.
+    the monotonic relationship between two variables. Oberservations with large
+    moments (outliers) are better handled by Spearman's correlation than
+    Pearson's.
 
     Parameters
     ----------

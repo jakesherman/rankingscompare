@@ -1,7 +1,7 @@
 from __future__ import division, print_function
 
-"""tau.py - implementing Kendall's tau and AP correlation, a top-weighted
-version of Kendalls' Tau.
+"""tau.py - rank correlation metrics that basically measure the probability of
+concordance minus the probability of discordance.
 """
 
 import itertools
@@ -9,15 +9,16 @@ import numpy as np
 from utilities import *
 
 
-def tau_statistics(l1, l2, combinations):
+def tau_stats(l1, l2, combinations):
     """Calculates the statistics used to compute the various correlation
     statistics based on Kendall's tau given two lists of numbers, and a list of
     tuples, which each tuple consisting of a pair of indexes that can be used to
     index either l1 or l2. Computing these is O(n^2).
     """
     assert len(l1) == len(l2), 'l1 and l2 must be paired data w/ equal length'
+    combinations = list(itertools.combinations(range(len(l1)), 2))
     n, concordant, discordant, l1_ties, l2_ties = len(l1), 0, 0, 0, 0
-    pairs = len(combinations)
+    pairs, m = len(combinations), min([len(set(l1)), len(set(l2))])
     for combo in combinations:
         xi, yi, xj, yj = l1[combo[0]], l2[combo[0]], l1[combo[1]], l2[combo[1]]
         l1_sign, l2_sign = sign(xi - xj), sign(yi - yj)
@@ -28,7 +29,7 @@ def tau_statistics(l1, l2, combinations):
         else:
             l1_ties += l1_sign == 0
             l2_ties += l2_sign == 0
-    return pairs, concordant, discordant, l1_ties, l2_ties
+    return pairs, concordant, discordant, l1_ties, l2_ties, m
 
 
 def tau_a(l1, l2):
@@ -51,8 +52,7 @@ def tau_a(l1, l2):
     -------
     Kendall's tau-a: float in [-1, 1]
     """
-    pairs, concordant, discordant, l1_ties, l2_ties = tau_statistics(l1, l2,
-        list(itertools.combinations(range(len(l1)), 2)))
+    pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
     if l1_ties + l2_ties > 0:
         raise Exception('No ties are allowed in tau_a!')
     return (concordant - discordant) / pairs
@@ -77,14 +77,21 @@ def tau_b(l1, l2):
     -------
     Kendall's tau-b: float in [-1, 1]
     """
-    pairs, concordant, discordant, l1_ties, l2_ties = tau_statistics(l1, l2,
-        list(itertools.combinations(range(len(l1)), 2)))
+    pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
     denominator = np.sqrt((pairs - l1_ties) * (pairs - l2_ties))
     return (concordant - discordant) / denominator
 
 
+def tau_c(l1, l2):
+    """tau-c, optimized for larger, rectangular tables.
+    """
+    pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
+    denominator = (2 * m) / (np.power(len(l1), 2) * (m - 1))
+    return (concordant - discordant) / denominator
+
+
 def goodman_kruskal_gamma(l1, l2):
-    """Goodman – Kruskal Gamma (G), very similar to Kendall's tau. Gamma is the
+    """Goodman - Kruskal Gamma (G), very similar to Kendall's tau. Gamma is the
     difference in concordant pairs and discordant pairs as a percentage of all
     possible pairs, ignoring ties.
 
@@ -99,10 +106,9 @@ def goodman_kruskal_gamma(l1, l2):
 
     Returns
     -------
-    Goodman – Kruskal Gamma: float in [-1, 1]
+    Goodman - Kruskal Gamma: float in [-1, 1]
     """
-    pairs, concordant, discordant, l1_ties, l2_ties = tau_statistics(l1, l2,
-        list(itertools.combinations(range(len(l1)), 2)))
+    pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
     return (concordant - discordant) / (concordant + discordant)
 
 
@@ -110,6 +116,8 @@ def ap_correlation(l1, l2, symmetric = False, reverse = True):
     """The AP correlation coefficient, proposed by Yilmaz et al. [2008] as an
     alternative version of Kendall's Tau that is top-weighted. Does not account
     for ties! Implementation is O(n^2).
+
+    R Implementation: http://www.mansci.uwaterloo.ca/~msmucker/software/apcorr.r
 
     Parameters
     ----------
