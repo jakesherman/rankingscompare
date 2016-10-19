@@ -35,6 +35,7 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
         How to deal with ties. Options are
         midrank -> mean of the positions that ties are occupying
         same -> repeat the highest (rank 1 > rank 2) position of the ties
+        arbitrary -> ties get unique ranks, chosen arbitrarily
         notallowed -> ties aren't allowed, raise an exception if there are ties
     reverse : bool
         If True, higher numbers correspond to higher ranks (aka 1, 2, ...) and

@@ -10,7 +10,7 @@ from utilities import *
 from warnings import warn
 
 
-def tau_stats(l1, l2, combinations):
+def tau_stats(l1, l2):
     """Calculates the statistics used to compute the various correlation
     statistics based on Kendall's tau given two lists of numbers, and a list of
     tuples, which each tuple consisting of a pair of indexes that can be used to
