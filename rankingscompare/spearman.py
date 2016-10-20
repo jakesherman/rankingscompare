@@ -113,6 +113,9 @@ def normalized_spearman_footrule(l1, l2, reverse = True, ranks = False,
     Spearman's Footrule by the maximum possible value. Described in Aguillo et
     al. [2010].
 
+    Couldn't find the above paper, but found it in Fagin et al. 2003, "Comparing
+    top k lists".
+
     Parameters
     ----------
     l1: list

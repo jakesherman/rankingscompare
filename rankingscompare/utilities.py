@@ -1,3 +1,5 @@
+from __future__ import division
+
 """utilities.py
 """
 
@@ -48,34 +50,45 @@ def to_rank(mylist, ties = 'midrank', reverse = True):
     """
     assert all([isinstance(item, float) or isinstance(item, int)
                 for item in mylist]), 'list must be a list of floats or ints!'
-    assert ties in ['midrank', 'same', 'notallowed'], 'incorrect ties method'
+    assert ties in ['midrank', 'same', 'arbitrary', 'notallowed'], \
+        'incorrect ties method'
     data = sorted([[item, i] for i, item in enumerate(mylist)],
         reverse = reverse)
-    ranks = []
-    current_ties, ties_end = [], False
-    for pos, (item, i) in enumerate(data):
-        try:
-            if item == data[pos + 1][0]:
-                current_ties.append(pos + 1)
-            else:
+    if ties == 'arbitrary':
+        ranks = [pos + 1 for pos, (item, i) in enumerate(data)]
+    else:
+        ranks = []
+        current_ties, ties_end = [], False
+        for pos, (item, i) in enumerate(data):
+            try:
+                if item == data[pos + 1][0]:
+                    current_ties.append(pos + 1)
+                else:
+                    if current_ties:
+                        ties_end = True
+            except:
                 if current_ties:
                     ties_end = True
-        except:
-            if current_ties:
-                ties_end = True
-        if len(current_ties) > 0 and ties_end:
-            if ties == 'notallowed':
-                raise Exception('No ties allowed!')
-            current_ties.append(pos + 1)
-            if ties == 'midrank':
-                ranks += [np.mean(current_ties)] * len(current_ties)
-            else:
-                ranks += [min(current_ties)] * len(current_ties)
-            current_ties, ties_end = [], False
-        elif not current_ties:
-            ranks.append(pos + 1)
+            if len(current_ties) > 0 and ties_end:
+                if ties == 'notallowed':
+                    raise Exception('No ties allowed!')
+                current_ties.append(pos + 1)
+                if ties == 'midrank':
+                    ranks += [np.mean(current_ties)] * len(current_ties)
+                else:
+                    ranks += [min(current_ties)] * len(current_ties)
+                current_ties, ties_end = [], False
+            elif not current_ties:
+                ranks.append(pos + 1)
     return [rank for i, rank in sorted(
         zip([item_i[1] for item_i in data], ranks))]
+
+
+def used_midranks(ranks):
+    """Given a set of rankings from 1, ..., len(ranks), returns True if the
+    midrank method was used to create the ranks.
+    """
+    return sum(range(1, len(ranks) + 1)) == sum(ranks)
 
 
 def sign(num):
@@ -94,3 +107,53 @@ def even(num):
     """True if a number if even, False if odd.
     """
     return not num % 2
+
+
+def reciprocal_sum(start, end):
+    """The sum of 1/start, ..., 1/end, incrementing by 1 in between.
+    """
+    assert isinstance(start, int) and isinstance(end, int), 'must be ints!'
+    assert 0 < start and start <= end, 'does not comply w/ 0 < start < end'
+    return sum([1.0 / number for number in range(start, end + 1)])
+
+
+def to_savage_scores(ranks):
+    """Generate savage scores for a set of rankings. Ties will be assigned the
+    mean of the savage scores for the rank positions that make up the tie. Ex.
+    if we have ranks [1, 2.5, 2.5, 4], where positions 2 and 3 are tied, then
+    positions 2 and 3 will be assigned the mean of savage(2) and savage(3).
+    Ranks must be generated using the midrank method to handle ties.
+
+    Parameters
+    ----------
+    ranks : list
+        List of ranks (can be ints or floats)
+
+    Returns
+    -------
+    a list of savage scores corresponding to the inputted ranks
+    """
+    assert used_midranks(ranks), 'ranks not generated using the midrank method!'
+    ranks_positions = sorted([[rank, pos] for pos, rank in enumerate(ranks)])
+    savage_scores = []
+    current_ties, ties_end, num_ranks = [], False, len(ranks)
+    for pos, (rank, _) in enumerate(ranks_positions):
+        try:
+            if rank == ranks_positions[pos + 1][0]:
+                current_ties.append(pos + 1)
+            else:
+                if current_ties:
+                    ties_end = True
+        except:
+            if current_ties:
+                ties_end = True
+        if len(current_ties) > 0 and ties_end:
+            current_ties.append(pos + 1)
+            savage_scores += [np.mean(
+                [reciprocal_sum(x, num_ranks)
+                 for x in current_ties])] * len(current_ties)
+            current_ties, ties_end = [], False
+        elif not current_ties:
+            savage_scores.append(reciprocal_sum(pos + 1, num_ranks))
+    return [savage_score for pos, savage_score in sorted(
+        zip([rnk_pos[1] for rnk_pos in ranks_positions], savage_scores))]
