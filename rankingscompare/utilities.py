@@ -121,8 +121,8 @@ def to_savage_scores(ranks):
     """Generate savage scores for a set of rankings. Ties will be assigned the
     mean of the savage scores for the rank positions that make up the tie. Ex.
     if we have ranks [1, 2.5, 2.5, 4], where positions 2 and 3 are tied, then
-    positions 2 and 3 will be assigned the mean of savage(2) and savage(3).
-    Ranks must be generated using the midrank method to handle ties.
+    positions 2 and 3 will be assigned the mean of savage(2, 4) and savage(3,
+    4).Ranks must be generated using the midrank method to handle ties.
 
     Parameters
     ----------

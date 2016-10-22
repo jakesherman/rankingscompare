@@ -56,6 +56,16 @@ def scipy_kendalltau(*args, **kwargs):
     return kendalltau(*args, **kwargs)[0]
 
 
+def _spearman_rho(l1, l2, reverse = True):
+    """Not for export, just using to validate the results of the spearman_rho
+    function. _spearman_rho only works if all n ranks are distinct integers.
+    """
+    assert len(l1) == len(l2), 'list inputs must be paired aka of = length!'
+    l1, l2 = to_rank(l1, reverse = reverse), to_rank(l2, reverse = reverse)
+    term = np.sum([np.power(xi - yi, 2) for xi, yi in zip(l1, l2)])
+    return 1 - ((6 * term) / (len(l1) * (np.power(len(l1), 2) - 1)))
+
+
 class TauTestCases(unittest.TestCase):
     """Tests for the functions in tau.py
     """
