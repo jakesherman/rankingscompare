@@ -103,10 +103,10 @@ def choose(n, k):
     return math.factorial(n) / (math.factorial(k) * math.factorial(n - k))
 
 
-def even(num):
-    """True if a number if even, False if odd.
+def odd(num):
+    """True if a number if odd, False if even.
     """
-    return not num % 2
+    return num % 2
 
 
 def reciprocal_sum(start, end):

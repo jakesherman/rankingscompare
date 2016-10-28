@@ -3,9 +3,9 @@ from rbo import (
     percent_overlap
 )
 from spearman import (
-    normalized_spearman_footrule,
     spearman_footrule,
-    spearman_rho
+    spearman_rho,
+    top_down_correlation
 )
 from tau import (
     ap_correlation,

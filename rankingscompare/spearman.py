@@ -12,7 +12,7 @@ def variance(l1, bessel_correction = True):
     """Variance of a list or array of numbers.
     """
     l1 = np.array(l1)
-    return np.sum(np.square(l1 - np.mean(l1))) / (len(l1) - bessel_correction)
+    return sum(np.square(l1 - np.mean(l1))) / (len(l1) - bessel_correction)
 
 
 def std_dev(l1):
@@ -26,7 +26,7 @@ def covariance(l1, l2, bessel_correction = True):
     """
     l1, l2 = np.array(l1), np.array(l2)
     assert len(l1) == len(l2), 'lists/arrays must be of same length!'
-    product_sum = np.sum((l1 - np.mean(l1)) * (l2 - np.mean(l2)))
+    product_sum = sum((l1 - np.mean(l1)) * (l2 - np.mean(l2)))
     return product_sum / (len(l1) - bessel_correction)
 
 
@@ -72,9 +72,9 @@ def spearman_rho(X, Y, reverse = True, ranks = False):
         first continous random variable
     X : list of floats/ints
         second continous random variable
-    reverse: bool (default is True)
+    reverse : bool (default is True)
         whether to rank values in descending order (True) or ascending order
-    ranks: bool (default is False)
+    ranks : bool (default is False)
         Are X and Y lists of values, or ranks? False indicates that these are
         lists of values, True indicates that the lists contain ranks.
 
@@ -105,9 +105,9 @@ def top_down_correlation(X, Y, reverse = True, ranks = False):
         first continous random variable
     X : list of floats/ints
         second continous random variable
-    reverse: bool (default is True)
+    reverse : bool (default is True)
         whether to rank values in descending order (True) or ascending order
-    ranks: bool (default is False)
+    ranks : bool (default is False)
         Are X and Y lists of values, or ranks? False indicates that these are
         lists of values, True indicates that the lists contain ranks.
 
@@ -153,14 +153,10 @@ def spearman_footrule(X, Y, reverse = True, ranks = False, measure = 'raw'):
     assert measure in ['raw', 'distance', 'similarity'], 'incorrect metric'
     assert len(X) == len(Y), 'list inputs must be paired aka of = length!'
     if measure != 'raw':
-        Z = len(X)
-        if even(Z):
-            max_sf = 0.5 * np.power(Z, 2)
-        else:
-            max_sf = 0.5 * (Z + 1) * (Z - 1)
+        max_df = 0.5 * (len(X) ** 2 - odd(len(X)))
         NFr = spearman_footrule(X, Y, reverse, ranks, 'raw') / max_sf
         return {'distance': NFr, 'similarity': 1 - NFr}[measure]
     else:
         if not ranks:
             X, Y = to_rank(X, reverse = reverse), to_rank(Y, reverse = reverse)
-        return int(np.sum([np.absolute(xi - yi) for xi, yi in zip(X, Y)]))
+        return int(sum([np.absolute(xi - yi) for xi, yi in zip(X, Y)]))

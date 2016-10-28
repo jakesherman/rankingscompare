@@ -150,9 +150,7 @@ def sommers_d(l1, l2, dependent = 'symmetric'):
 def ap_correlation(l1, l2, symmetric = False, reverse = True):
     """The AP correlation coefficient, proposed by Yilmaz et al. [2008] as an
     alternative version of Kendall's Tau that is top-weighted. Does not account
-    for ties! Implementation is O(n^2).
-
-    R Implementation: http://www.mansci.uwaterloo.ca/~msmucker/software/apcorr.r
+    for ties! Implementation is O(n^2), until Knight's algorithm is implemented.
 
     Parameters
     ----------
@@ -167,8 +165,7 @@ def ap_correlation(l1, l2, symmetric = False, reverse = True):
         f(a, b) and f(b, a). If symmetric is set to True, it doesn't matter
         which ranked list is l1 and which is l2.
     reverse: bool (default is True)
-        whether to rank values in descending order (True) or ascending order
-        (False)
+        rank values in descending order (True) or ascending order (False)
 
     Returns
     -------
