@@ -138,13 +138,11 @@ def sommers_d(l1, l2, dependent = 'symmetric'):
     pairs, concordant, discordant, l1_ties, l2_ties, m = tau_stats(l1, l2)
     if dependent == 'symmetric':
         return (sommers_d(l1, l2, 'l1') + sommers_d(l1, l2, 'l2')) / 2
-    elif dependent == 'l1':
-        denominator = concordant + discordant + l1_ties
-    elif dependent == 'l2':
-        denominator = concordant + discordant + l2_ties
-    else:
-        raise Exception('Invalid [dependent] argument!')
-    return (concordant - discordant) / denominator
+    denominators = {
+        'l1': concordant + discordant + l1_ties,
+        'l2': concordant + discordant + l2_ties
+    }
+    return (concordant - discordant) / denominators[dependent]
 
 
 def ap_correlation(l1, l2, symmetric = False, reverse = True):

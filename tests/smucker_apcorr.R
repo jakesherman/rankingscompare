@@ -59,3 +59,34 @@ plot(means)
 truth <- c(1, 2, 3, 4)
 estimate <- c(2.5, 2.5, 2.5, 2.5)
 apcorr.nosampling(truth, estimate)
+
+## apcorr.nosampling -----------------------------------------------------------
+
+function( truth, estimate )
+{
+    # we're going to say that the scores at rank i are for an
+    # item with an ID of i.  Thus "ID" means the index into
+    # the truth and estimate vectors.
+    n <- length(truth) 
+    if ( length(estimate) != n )
+        stop( "must be same length" )
+    truth.order <- order( truth, decreasing=TRUE ) 
+    estimate.order <- order( estimate, decreasing=TRUE ) 
+    innerSum <- 0
+    for ( i in 2:n )
+    {
+        currDocID <- estimate.order[i] 
+        estimate.rankedHigherIDs <- estimate.order[1:(i-1)] 
+        # where is the current doc in the truth order?
+        currDoc.truth.order.index <- which( truth.order == currDocID )
+        truth.rankedHigherIDs <- vector()
+        if ( currDoc.truth.order.index != 1 ) # top ranked doc, beware
+        {
+            truth.rankedHigherIDs <- truth.order[1:(currDoc.truth.order.index-1)]
+        }
+        C_i <- length( intersect(estimate.rankedHigherIDs, truth.rankedHigherIDs) )
+        innerSum <- innerSum + (C_i / (i-1))
+    }
+    result = 2 / (n-1) * innerSum - 1   
+    return( result )
+}
